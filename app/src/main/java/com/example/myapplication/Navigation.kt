@@ -6,6 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+
+/*
+I used the navigation tutorial from this site
+https://developer.android.com/guide/navigation/use-graph/navigate
+
+Searched on 24.1.2024
+*/
+
 @Composable
 fun SetupNavGraph(
     navController: NavHostController = rememberNavController()
