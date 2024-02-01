@@ -10,7 +10,8 @@ object SampleData {
     val conversationSample = listOf(
         Message(
             "Jack",
-            "Test...Test...Test..."
+            "Test...Test...Test...",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
@@ -23,55 +24,67 @@ object SampleData {
             |Android Pie (API 28)
             |Android 10 (API 29)
             |Android 11 (API 30)
-            |Android 12 (API 31)""".trim()
+            |Android 12 (API 31)""".trim(),
+            "profilePictureUri"
         ),
         Message(
             "Jack",
             """I think Kotlin is my favorite programming language.
-            |It's so much fun!""".trim()
+            |It's so much fun!""".trim(),
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Searching for alternatives to XML layouts..."
+            "Searching for alternatives to XML layouts...",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
             """Hey, take a look at Jetpack Compose, it's great!
             |It's the Android's modern toolkit for building native UI.
             |It simplifies and accelerates UI development on Android.
-            |Less code, powerful tools, and intuitive Kotlin APIs :)""".trim()
+            |Less code, powerful tools, and intuitive Kotlin APIs :)""".trim(),
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "It's available from API 21+ :)"
+            "It's available from API 21+ :)",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Writing Kotlin for UI seems so natural, Compose where have you been all my life?"
+            "Writing Kotlin for UI seems so natural, Compose where have you been all my life?",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Android Studio next version's name is Arctic Fox"
+            "Android Studio next version's name is Arctic Fox",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Android Studio Arctic Fox tooling for Compose is top notch ^_^"
+            "Android Studio Arctic Fox tooling for Compose is top notch ^_^",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "I didn't know you can now run the emulator directly from Android Studio"
+            "I didn't know you can now run the emulator directly from Android Studio",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Compose Previews are great to check quickly how a composable layout looks like"
+            "Compose Previews are great to check quickly how a composable layout looks like",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Previews are also interactive after enabling the experimental setting"
+            "Previews are also interactive after enabling the experimental setting",
+            "profilePictureUri"
         ),
         Message(
             "Jack",
-            "Have you tried writing build.gradle with KTS?"
+            "Have you tried writing build.gradle with KTS?",
+            "profilePictureUri"
         ),
     )
 }

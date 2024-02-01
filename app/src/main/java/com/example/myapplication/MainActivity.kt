@@ -36,13 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Text
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-
-/*
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-*/
+import androidx.room.Room
 
 /*
  * This code was made using a tutorial:
@@ -53,18 +50,27 @@ import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
 
+    lateinit var db: AppDatabase
     lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "database-name"
+        ).build()
+
         setContent {
             MyApplicationTheme {
 
                 navController = rememberNavController()
-                SetupNavGraph(navController = navController)
+                SetupNavGraph(navController = navController, db = db)
 
             }
         }
     }
 }
+
+
 
