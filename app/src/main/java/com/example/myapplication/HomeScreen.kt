@@ -33,12 +33,28 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+// ...
 
 @Composable
 fun HomeScreen(navController: NavHostController, db: AppDatabase) {
     var name by remember { mutableStateOf("") }
     var profilePictureUri by remember { mutableStateOf<Uri?>(null) }
     var user by remember { mutableStateOf<User?>(null) }
+
+    // Load user data if it already exists in the database
+    LaunchedEffect(key1 = db) {
+        user = withContext(Dispatchers.IO) {
+            db.userDao().getUser()
+        }
+
+        // Set the initial values if the user exists
+        user?.let {
+            name = it.name
+            profilePictureUri = Uri.parse(it.profilePictureUri)
+        }
+    }
 
     val context = LocalContext.current
     val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
@@ -56,7 +72,10 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
             // Text input for entering name
             TextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = { newName ->
+                    name = newName
+                    user = User(name = newName, profilePictureUri = profilePictureUri.toString())
+                },
                 label = { Text("Enter your name") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -110,4 +129,6 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
         }
     }
 }
+
+
 
