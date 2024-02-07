@@ -1,6 +1,11 @@
 package com.example.myapplication
 
+import android.Manifest
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -26,8 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelStore
-import androidx.navigation.NavController
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
@@ -61,12 +67,15 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
         profilePictureUri = uri
     }
 
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Text input for entering name
@@ -126,9 +135,42 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
                     style = MaterialTheme.typography.titleSmall
                 )
             }
+
+            val context = LocalContext.current // Get the local context
+
+            var hasNotificationPermission by remember {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mutableStateOf(
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    )
+                } else mutableStateOf(true)
+            }
+
+            //Allow Notifications
+            Button(
+                onClick = {
+                    showNotification(context)
+                }
+            ) {
+                Text(
+                    text = "Allow Notifications",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
         }
     }
 }
 
-
-
+private fun showNotification(context: Context){
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notification = NotificationCompat.Builder(context, "channel_id")
+        .setContentText("here some text")
+        .setContentTitle("Title")
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .build()
+    notificationManager.notify(1, notification)
+}
