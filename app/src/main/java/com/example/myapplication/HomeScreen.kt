@@ -2,7 +2,9 @@ package com.example.myapplication
 
 import android.Manifest
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -166,11 +168,27 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
 }
 
 private fun showNotification(context: Context){
+
+    /*
+    * This code was made using a tutorial:
+    * Create a notification
+    * https://developer.android.com/develop/ui/views/notifications/build-notification#kotlin
+    * 7.2.2024
+    */
+
+    // Create an explicit intent for an Activity in your app.
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notification = NotificationCompat.Builder(context, "channel_id")
         .setContentText("here some text")
         .setContentTitle("Title")
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setContentIntent(pendingIntent)
+        .setAutoCancel(true)
         .build()
     notificationManager.notify(1, notification)
 }
