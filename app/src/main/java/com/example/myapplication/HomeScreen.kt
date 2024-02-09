@@ -1,11 +1,16 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -38,12 +43,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.AppSettings.areNotificationsAllowed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-// ...
+import kotlin.math.abs
 
 @Composable
 fun HomeScreen(navController: NavHostController, db: AppDatabase) {
@@ -154,7 +159,22 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
             //Allow Notifications
             Button(
                 onClick = {
-                    showNotification(context)
+                    AlertDialog.Builder(context)
+                        .setTitle("Allow Notifications")
+                        .setMessage("Do you want to allow notifications?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            areNotificationsAllowed = true
+                            // Open the app's system settings to allow the user to enable notifications
+                            val intent = Intent().apply {
+                                action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                                putExtra("app_package", context.packageName)
+                                putExtra("app_uid", context.applicationInfo.uid)
+                                putExtra("android.provider.extra.APP_PACKAGE", context.packageName)
+                            }
+                            context.startActivity(intent)
+                        }
+                        .setNegativeButton("No", null)
+                        .show()
                 }
             ) {
                 Text(
@@ -163,32 +183,73 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
                     style = MaterialTheme.typography.titleSmall
                 )
             }
+
         }
     }
 }
 
-private fun showNotification(context: Context){
+class RotationSensor(private val context: Context, private val sensorManager: SensorManager) : SensorEventListener {
 
-    /*
-    * This code was made using a tutorial:
-    * Create a notification
-    * https://developer.android.com/develop/ui/views/notifications/build-notification#kotlin
-    * 7.2.2024
-    */
+    private val rotationSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+    private var lastNotifiedRotation: Float = 0f
+    private val rotationThreshold = 45
 
-    // Create an explicit intent for an Activity in your app.
-    val intent = Intent(context, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    init {
+        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
-    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    val notification = NotificationCompat.Builder(context, "channel_id")
-        .setContentText("here some text")
-        .setContentTitle("Title")
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentIntent(pendingIntent)
-        .setAutoCancel(true)
-        .build()
-    notificationManager.notify(1, notification)
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Handle accuracy changes
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?.values?.let { rotationVector ->
+            val rotationMatrix = FloatArray(9)
+            SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVector)
+
+            val adjustedRotationMatrix = FloatArray(9)
+            SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, adjustedRotationMatrix)
+
+            val orientation = FloatArray(3)
+            SensorManager.getOrientation(adjustedRotationMatrix, orientation)
+
+            val rotation = Math.toDegrees(orientation[0].toDouble()).toFloat()
+            val rotationDifference = abs(rotation - lastNotifiedRotation)
+
+            if (rotationDifference > rotationThreshold) {
+                lastNotifiedRotation = rotation
+                showNotification(context, "Phone rotated more than 45 degrees")
+            }
+        }
+    }
+
+    private fun showNotification(context: Context, message: String) {
+        if (areNotificationsAllowed) {
+            // Create an explicit intent for an Activity in your app.
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val pendingIntent: PendingIntent =
+                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notification = NotificationCompat.Builder(context, "channel_id")
+                .setContentTitle("WOW SPINNING")
+                .setContentText("That phone really doing tricks")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+            notificationManager.notify(1, notification)
+        }
+    }
+
+    fun unregister() {
+        sensorManager.unregisterListener(this)
+    }
+}
+
+object AppSettings {
+    var areNotificationsAllowed = false
 }

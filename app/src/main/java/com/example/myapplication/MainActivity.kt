@@ -4,6 +4,7 @@ package com.example.myapplication
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
 
     lateinit var db: AppDatabase
     lateinit var navController: NavHostController
+    lateinit var rotationSensor: RotationSensor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,9 @@ class MainActivity : ComponentActivity() {
             )
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+
+            val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+            rotationSensor = RotationSensor(this, sensorManager)
         }
 
         db = Room.databaseBuilder(
@@ -51,5 +56,9 @@ class MainActivity : ComponentActivity() {
 
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        rotationSensor.unregister()
     }
 }
