@@ -20,7 +20,14 @@ import androidx.room.Room
  * Jetpack Compose Tutorial
  * https://developer.android.com/jetpack/compose/tutorial
  * 10.1.2024
- */
+ *
+ * ///////////////////////////////////////////////////////////////////////////////////////////
+ *
+ * For splash screen I used this as a tutorial and a reference:
+ *How to Build an Animated Splash Screen on Android - The Full Guide (Youtube: Philipp Lackner)
+ * https://www.youtube.com/watch?v=eFZmMSm1G1c
+ * 16.02.2024
+*/
 
 class MainActivity : ComponentActivity() {
 
@@ -53,10 +60,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyApplicationTheme {
-
                 navController = rememberNavController()
                 SetupNavGraph(navController = navController, db = db)
-
             }
         }
     }
