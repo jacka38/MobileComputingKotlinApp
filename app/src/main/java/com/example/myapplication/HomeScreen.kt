@@ -173,6 +173,18 @@ fun HomeScreen(navController: NavHostController, db: AppDatabase) {
                     style = MaterialTheme.typography.titleSmall
                 )
             }
+
+            Button(
+                onClick = {
+                    navController.navigate(route = Screen.VideoScreen.route)
+                }
+            ) {
+                Text(
+                    text = "Video player",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
         }
     }
 }

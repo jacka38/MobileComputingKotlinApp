@@ -39,6 +39,11 @@ fun SetupNavGraph(
         ) {
             ConversationScreen(navController, db)
         }
+        composable(
+            route = Screen.VideoScreen.route
+        ) {
+            VideoScreen(videoUri)
+        }
     }
 }
 
